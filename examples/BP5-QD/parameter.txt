@@ -14,7 +14,7 @@ Using C++ green function:True
 Max_thread workers: 50
 Batch_size: 1000
 GPU:True
-GPU_cores:2
+GPU_cores:8
 
 #Property
 Lame constants: 32038120320.0

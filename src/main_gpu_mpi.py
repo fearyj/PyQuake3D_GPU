@@ -12,6 +12,8 @@ from datetime import datetime
 from mpi4py import MPI
 import config
 import Hmatrix as Hmat
+import cProfile
+import pstats
 
 os.environ["OMP_NUM_THREADS"] = "1"
 os.environ["MKL_NUM_THREADS"] = "1"
@@ -103,7 +105,23 @@ if __name__ == "__main__":
     #if(rank<2):
     #print(len(sim0.local_blocks),rank,size,len(sim0.local_index))
         #print(len(sim0.blocks_to_process))
+    cp = cProfile.Profile()
+    cp.enable()
     sim0.start_gpu()
+    cp.disable()
+
+    # Save per-rank profile data
+    os.makedirs("./cpu_profile", exist_ok=True)
+    cp.dump_stats(f"./cpu_profile/rank_{rank}.prof")
+
+    if rank == 0:
+        stats = pstats.Stats(cp)
+        stats.sort_stats("cumulative")
+        print("\n=== Top 40 functions by cumulative time ===")
+        stats.print_stats(40)
+        stats.sort_stats("tottime")
+        print("\n=== Top 40 functions by self time ===")
+        stats.print_stats(40)
     #sim0.start()
     
 
